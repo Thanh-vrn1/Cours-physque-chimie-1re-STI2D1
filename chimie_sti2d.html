@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chimie 1ère STI2D — Cours & Exercices</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #171b26;
+    --surface2: #1e2333;
+    --border: #2a3050;
+    --accent1: #4fc3f7;
+    --accent2: #ff6b6b;
+    --accent3: #a8e6cf;
+    --accent4: #ffd93d;
+    --accent5: #c084fc;
+    --text: #e8eaf6;
+    --muted: #8892b0;
+    --red: #ff6b6b;
+    --blue: #4fc3f7;
+    --green: #a8e6cf;
+    --yellow: #ffd93d;
+    --purple: #c084fc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(15,17,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: 0; overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  nav button {
+    background: none; border: none; color: var(--muted);
+    font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 700;
+    padding: 14px 18px; cursor: pointer; white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: all .2s;
+    letter-spacing: .05em; text-transform: uppercase;
+  }
+  nav button.active { color: var(--accent1); border-color: var(--accent1); }
+  nav button:hover:not(.active) { color: var(--text); border-color: var(--border); }
+
+  /* SECTIONS */
+  section { display: none; padding: 32px 20px; max-width: 860px; margin: 0 auto; }
+  section.active { display: block; }
+
+  /* HEADER */
+  .page-header {
+    text-align: center; margin-bottom: 40px;
+  }
+  .page-header .tag {
+    display: inline-block;
+    background: var(--accent1)22;
+    color: var(--accent1);
+    border: 1px solid var(--accent1)44;
+    font-size: .7rem; font-weight: 800; letter-spacing: .15em;
+    text-transform: uppercase; padding: 4px 12px; border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    color: var(--text);
+    line-height: 1.15;
+    margin-bottom: 10px;
+  }
+  .page-header p { color: var(--muted); font-size: .95rem; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .card.highlight-blue { border-color: var(--blue)66; background: linear-gradient(135deg, var(--surface), #0a2233); }
+  .card.highlight-red  { border-color: var(--red)66;  background: linear-gradient(135deg, var(--surface), #2a0f0f); }
+  .card.highlight-green{ border-color: var(--green)66;background: linear-gradient(135deg, var(--surface), #0f2a1a); }
+  .card.highlight-yellow{ border-color: var(--yellow)66;background: linear-gradient(135deg, var(--surface), #2a2200); }
+  .card.highlight-purple{ border-color: var(--purple)66;background: linear-gradient(135deg, var(--surface), #1e0a2a); }
+
+  .card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .card h3 { font-size: 1rem; font-weight: 800; margin: 16px 0 8px; color: var(--accent4); }
+  .card p, .card li { font-size: .93rem; color: #c8cfe0; margin-bottom: 6px; }
+  .card ul { padding-left: 20px; }
+  .card li { margin-bottom: 4px; }
+
+  /* FORMULAS */
+  .formula {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    font-size: .9rem;
+    color: var(--accent1);
+    white-space: pre-wrap;
+  }
+  .formula .oxyd { color: var(--red); }
+  .formula .reduc { color: var(--green); }
+  .formula .coef { color: var(--yellow); font-weight: 600; }
+  .formula .arrow { color: var(--purple); }
+
+  /* TABLEAU D'AVANCEMENT */
+  .tableau-wrap { overflow-x: auto; margin: 14px 0; }
+  table {
+    width: 100%; border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .82rem;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--accent1);
+    padding: 10px 14px; text-align: center;
+    border: 1px solid var(--border);
+    font-size: .78rem; letter-spacing: .05em;
+  }
+  td {
+    padding: 9px 14px; text-align: center;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:nth-child(even) td { background: var(--surface2)88; }
+  .td-eq { color: var(--yellow); font-weight: 700; }
+  .td-init { color: var(--green); }
+  .td-avance { color: var(--accent1); }
+  .td-final { color: var(--accent4); }
+  .td-blank { background: var(--bg)!important; border: none!important; }
+
+  /* RÈGLES */
+  .rule-box {
+    background: var(--surface2);
+    border-left: 4px solid var(--accent1);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    margin: 12px 0;
+  }
+  .rule-box.red { border-color: var(--red); }
+  .rule-box.green { border-color: var(--green); }
+  .rule-box.yellow { border-color: var(--yellow); }
+  .rule-box.purple { border-color: var(--purple); }
+  .rule-box .label {
+    font-size: .7rem; font-weight: 800; letter-spacing: .1em;
+    text-transform: uppercase; margin-bottom: 6px;
+    color: var(--accent1);
+  }
+  .rule-box.red .label { color: var(--red); }
+  .rule-box.green .label { color: var(--green); }
+  .rule-box.yellow .label { color: var(--yellow); }
+  .rule-box.purple .label { color: var(--purple); }
+  .rule-box p { font-size: .9rem; color: var(--text); margin: 0; }
+
+  /* EXERCICES */
+  .exo-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+  }
+  .exo-num {
+    background: var(--accent1);
+    color: #0f1117;
+    font-weight: 800; font-size: .85rem;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .exo-num.red { background: var(--red); }
+  .exo-num.green { background: var(--green); }
+  .exo-num.yellow { background: var(--yellow); }
+  .exo-num.purple { background: var(--purple); }
+  .exo-title { font-weight: 800; font-size: 1rem; }
+
+  .question {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 10px 0;
+  }
+  .question p { color: var(--text); font-size: .9rem; margin: 0; }
+  .question .q-num { color: var(--accent1); font-weight: 800; margin-right: 6px; }
+
+  /* CORRECTION toggle */
+  .corr-btn {
+    background: none; border: 1px solid var(--border);
+    color: var(--muted); font-family: 'Nunito', sans-serif;
+    font-size: .8rem; font-weight: 700; cursor: pointer;
+    padding: 7px 16px; border-radius: 20px; margin-top: 14px;
+    transition: all .2s; letter-spacing: .05em;
+  }
+  .corr-btn:hover { border-color: var(--accent1); color: var(--accent1); }
+  .corr-btn.open { border-color: var(--green); color: var(--green); }
+
+  .correction {
+    display: none;
+    background: #0f2a1a;
+    border: 1px solid var(--green)44;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 10px;
+  }
+  .correction.show { display: block; }
+  .correction h4 { color: var(--green); font-size: .85rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px; }
+  .correction p, .correction li { font-size: .88rem; color: #c8e6c0; margin-bottom: 6px; }
+
+  /* BADGES */
+  .badge {
+    display: inline-block; font-size: .68rem; font-weight: 800;
+    letter-spacing: .08em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 20px; margin-left: 8px;
+    vertical-align: middle;
+  }
+  .badge.facile { background: var(--green)22; color: var(--green); border: 1px solid var(--green)44; }
+  .badge.moyen  { background: var(--yellow)22; color: var(--yellow); border: 1px solid var(--yellow)44; }
+  .badge.diff   { background: var(--red)22; color: var(--red); border: 1px solid var(--red)44; }
+
+  /* DEMI-EQ TABLE */
+  .demi-eq {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    align-items: center; gap: 10px;
+    background: var(--surface2); border-radius: 10px;
+    padding: 12px 16px; margin: 8px 0;
+    font-family: 'JetBrains Mono', monospace; font-size: .88rem;
+  }
+  .demi-eq .side { text-align: center; }
+  .demi-eq .arr { color: var(--purple); font-size: 1.2rem; font-weight: 700; }
+  .demi-eq .oxyd-side { color: var(--red)cc; }
+  .demi-eq .reduc-side { color: var(--green)cc; }
+
+  /* SEPARATOR */
+  .sep { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  /* MEMO BOX */
+  .memo {
+    background: var(--yellow)11;
+    border: 1px solid var(--yellow)44;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 16px 0;
+  }
+  .memo .memo-title { color: var(--yellow); font-weight: 800; font-size: .85rem; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+  .memo p { font-size: .9rem; }
+
+  /* ANIM */
+  section.active .card { animation: fadeUp .35s ease both; }
+  section.active .card:nth-child(2) { animation-delay: .05s; }
+  section.active .card:nth-child(3) { animation-delay: .1s; }
+  section.active .card:nth-child(4) { animation-delay: .15s; }
+  section.active .card:nth-child(5) { animation-delay: .2s; }
+  section.active .card:nth-child(6) { animation-delay: .25s; }
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(18px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  /* PRINT hint */
+  .print-hint {
+    text-align: center; color: var(--muted); font-size: .78rem;
+    margin-bottom: 28px;
+  }
+
+  sub, sup { font-size: 0.72em; }
+</style>
+</head>
+<body>
+
+<nav>
+  <button class="active" onclick="show('combustion')">🔥 Combustion</button>
+  <button onclick="show('avancement')">📊 Tableau avancement</button>
+  <button onclick="show('oxydoreduction')">⚡ Oxydoréduction</button>
+  <button onclick="show('demiequation')">⚗️ Demi-équations</button>
+  <button onclick="show('exos')">✏️ Exercices</button>
+</nav>
+
+<!-- ===================== COMBUSTION ===================== -->
+<section id="combustion" class="active">
+  <div class="page-header">
+    <div class="tag">Cours — Chimie STI2D</div>
+    <h1>La Combustion</h1>
+    <p>Réaction entre un combustible et un comburant (O₂)</p>
+  </div>
+  <p class="print-hint">📓 Prends des notes sur ton cahier de brouillon !</p>
+
+  <div class="card highlight-blue">
+    <h2>🔥 Définition</h2>
+    <p>La <strong>combustion</strong> est une réaction chimique <strong>exothermique</strong> entre :</p>
+    <ul>
+      <li><strong>Un combustible</strong> : hydrocarbure (carbone C, hydrogène H, parfois oxygène O et soufre S)</li>
+      <li><strong>Un comburant</strong> : le dioxygène O₂ de l'air</li>
+    </ul>
+    <div class="rule-box">
+      <div class="label">⚠️ À retenir</div>
+      <p>Combustion <strong>complète</strong> → produits : CO₂ + H₂O (+ SO₂ si soufre)</p>
+      <p>Combustion <strong>incomplète</strong> → produits : CO₂ + CO + H₂O (manque d'O₂)</p>
+    </div>
+  </div>
+
+  <div class="card highlight-red">
+    <h2>⚖️ Écrire et équilibrer une combustion</h2>
+    <h3>Méthode en 4 étapes</h3>
+    <div class="rule-box yellow">
+      <div class="label">Étape 1 – Écrire les réactifs et produits</div>
+      <p>Combustible + O₂ → CO₂ + H₂O</p>
+    </div>
+    <div class="rule-box yellow">
+      <div class="label">Étape 2 – Équilibrer C</div>
+      <p>Coefficient devant CO₂ = nombre d'atomes de C dans le combustible</p>
+    </div>
+    <div class="rule-box yellow">
+      <div class="label">Étape 3 – Équilibrer H</div>
+      <p>Coefficient devant H₂O = (nombre d'atomes H) ÷ 2</p>
+    </div>
+    <div class="rule-box yellow">
+      <div class="label">Étape 4 – Équilibrer O</div>
+      <p>Compter tous les O à droite → coefficient devant O₂</p>
+    </div>
+
+    <h3>Exemple : combustion du méthane CH₄</h3>
+    <div class="formula">CH₄  +  <span class="coef">2</span> O₂  <span class="arrow">→</span>  <span class="coef">1</span> CO₂  +  <span class="coef">2</span> H₂O</div>
+    <p style="font-size:.85rem; color:var(--muted)">C : 1→1 ✓ &nbsp;|&nbsp; H : 4→4 ✓ &nbsp;|&nbsp; O : 4→4 ✓</p>
+
+    <h3>Exemple : combustion du propane C₃H₈</h3>
+    <div class="formula">C₃H₈  +  <span class="coef">5</span> O₂  <span class="arrow">→</span>  <span class="coef">3</span> CO₂  +  <span class="coef">4</span> H₂O</div>
+    <p style="font-size:.85rem; color:var(--muted)">C : 3→3 ✓ &nbsp;|&nbsp; H : 8→8 ✓ &nbsp;|&nbsp; O : 10→10 ✓</p>
+
+    <h3>Exemple : combustion du butane C₄H₁₀</h3>
+    <div class="formula">2 C₄H₁₀  +  <span class="coef">13</span> O₂  <span class="arrow">→</span>  <span class="coef">8</span> CO₂  +  <span class="coef">10</span> H₂O</div>
+  </div>
+
+  <div class="card highlight-green">
+    <h2>📐 Formule générale des alcanes</h2>
+    <div class="formula">C<sub>n</sub>H<sub>2n+2</sub>  +  <span class="coef">( (3n+1)/2 )</span> O₂  <span class="arrow">→</span>  n CO₂  +  (n+1) H₂O</div>
+    <div class="memo">
+      <div class="memo-title">🧠 Astuce mnémotechnique</div>
+      <p><strong>C avant tout, H ensuite, O en dernier</strong> — toujours dans cet ordre pour équilibrer !</p>
+    </div>
+  </div>
+
+  <div class="card highlight-yellow">
+    <h2>🌡️ Enthalpie de combustion</h2>
+    <p>La réaction libère de l'énergie : <strong>ΔH < 0</strong> (réaction exothermique)</p>
+    <div class="rule-box">
+      <div class="label">À savoir</div>
+      <p>L'enthalpie de combustion est toujours <strong>négative</strong> pour un combustible. Plus elle est grande (en valeur absolue), plus le combustible est énergétique.</p>
+    </div>
+    <div class="formula">Exemple : ΔH°<sub>comb</sub>(CH₄) = <span class="coef">−890 kJ/mol</span></div>
+  </div>
+</section>
+
+<!-- ===================== AVANCEMENT ===================== -->
+<section id="avancement">
+  <div class="page-header">
+    <div class="tag">Cours — Chimie STI2D</div>
+    <h1>Tableau d'avancement</h1>
+    <p>Suivre l'évolution d'une réaction chimique</p>
+  </div>
+
+  <div class="card highlight-blue">
+    <h2>📊 Principe</h2>
+    <p>Le <strong>tableau d'avancement</strong> permet de suivre l'évolution des quantités de matière des espèces chimiques au cours d'une réaction.</p>
+    <div class="rule-box">
+      <div class="label">Variable d'avancement x</div>
+      <p><strong>x</strong> est en <strong>moles (mol)</strong>. Elle augmente de 0 jusqu'à x<sub>max</sub> (fin de réaction).</p>
+    </div>
+    <p>Pour une réaction : <code>a A + b B → c C + d D</code></p>
+    <div class="tableau-wrap">
+      <table>
+        <tr>
+          <th>État</th>
+          <th>Avancement</th>
+          <th>n(A)</th>
+          <th>n(B)</th>
+          <th>n(C)</th>
+          <th>n(D)</th>
+        </tr>
+        <tr>
+          <td class="td-init">Initial</td>
+          <td class="td-eq">x = 0</td>
+          <td class="td-init">n₀(A)</td>
+          <td class="td-init">n₀(B)</td>
+          <td class="td-init">0</td>
+          <td class="td-init">0</td>
+        </tr>
+        <tr>
+          <td class="td-avance">En cours</td>
+          <td class="td-eq">x</td>
+          <td class="td-avance">n₀(A) − ax</td>
+          <td class="td-avance">n₀(B) − bx</td>
+          <td class="td-avance">cx</td>
+          <td class="td-avance">dx</td>
+        </tr>
+        <tr>
+          <td class="td-final">Final</td>
+          <td class="td-eq">x<sub>max</sub></td>
+          <td class="td-final">n₀(A)−ax<sub>max</sub></td>
+          <td class="td-final">n₀(B)−bx<sub>max</sub></td>
+          <td class="td-final">cx<sub>max</sub></td>
+          <td class="td-final">dx<sub>max</sub></td>
+        </tr>
+      </table>
+    </div>
+    <p style="font-size:.82rem;color:var(--muted);margin-top:8px">Les coefficients <strong>a, b, c, d</strong> sont les coefficients stœchiométriques de l'équation.</p>
+  </div>
+
+  <div class="card highlight-green">
+    <h2>🔍 Réactif limitant</h2>
+    <p>Le <strong>réactif limitant</strong> est celui qui est entièrement consommé en premier. Il détermine x<sub>max</sub>.</p>
+    <div class="rule-box green">
+      <div class="label">Méthode</div>
+      <p>Pour chaque réactif, calculer : <strong>n₀(réactif) / coefficient stochio</strong></p>
+      <p>Le réactif limitant est celui qui donne la <strong>valeur minimale</strong>.</p>
+    </div>
+    <div class="formula">x<sub>max</sub> = min( n₀(A)/a , n₀(B)/b )</div>
+
+    <h3>Exemple concret</h3>
+    <p>Réaction : <code>N₂ + 3 H₂ → 2 NH₃</code></p>
+    <p>On mélange 2 mol de N₂ et 4 mol de H₂.</p>
+    <div class="formula">N₂ : 2/1 = 2 mol
+H₂ : 4/3 = 1,33 mol  ← <span class="coef">minimum → H₂ est le réactif limitant</span>
+x<sub>max</sub> = 1,33 mol</div>
+  </div>
+
+  <div class="card highlight-yellow">
+    <h2>🔢 Exemple complet — Combustion du propane</h2>
+    <p>Réaction : <code>C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O</code></p>
+    <p>Données : n₀(C₃H₈) = 0,5 mol &nbsp;|&nbsp; n₀(O₂) = 3 mol</p>
+
+    <h3>Réactif limitant ?</h3>
+    <div class="formula">C₃H₈ : 0,5 / 1 = 0,5
+O₂    : 3   / 5 = 0,6
+→ C₃H₈ est le réactif limitant → x<sub>max</sub> = 0,5 mol</div>
+
+    <div class="tableau-wrap">
+      <table>
+        <tr>
+          <th>État</th>
+          <th>x (mol)</th>
+          <th>n(C₃H₈)</th>
+          <th>n(O₂)</th>
+          <th>n(CO₂)</th>
+          <th>n(H₂O)</th>
+        </tr>
+        <tr>
+          <td class="td-init">Initial</td>
+          <td class="td-eq">0</td>
+          <td class="td-init">0,5</td>
+          <td class="td-init">3</td>
+          <td class="td-init">0</td>
+          <td class="td-init">0</td>
+        </tr>
+        <tr>
+          <td class="td-avance">En cours</td>
+          <td class="td-eq">x</td>
+          <td class="td-avance">0,5 − x</td>
+          <td class="td-avance">3 − 5x</td>
+          <td class="td-avance">3x</td>
+          <td class="td-avance">4x</td>
+        </tr>
+        <tr>
+          <td class="td-final">Final</td>
+          <td class="td-eq">0,5</td>
+          <td class="td-final">0</td>
+          <td class="td-final">0,5</td>
+          <td class="td-final">1,5</td>
+          <td class="td-final">2</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>💡 Taux d'avancement</h2>
+    <div class="formula">τ = x<sub>max</sub> / x<sub>max théo</sub></div>
+    <p>Si τ = 1 → réaction totale. Si τ &lt; 1 → réaction incomplète (équilibre chimique).</p>
+  </div>
+</section>
+
+<!-- ===================== OXYDOREDUCTION ===================== -->
+<section id="oxydoreduction">
+  <div class="page-header">
+    <div class="tag">Cours — Chimie STI2D</div>
+    <h1>Oxydoréduction</h1>
+    <p>Transfert d'électrons entre oxydants et réducteurs</p>
+  </div>
+
+  <div class="card highlight-red">
+    <h2>⚡ Définitions fondamentales</h2>
+    <div class="rule-box red">
+      <div class="label">Oxydation</div>
+      <p>Une espèce <strong>perd des électrons</strong> → elle est le <strong>réducteur</strong> (Réd₁). Elle est oxydée.</p>
+    </div>
+    <div class="rule-box green">
+      <div class="label">Réduction</div>
+      <p>Une espèce <strong>gagne des électrons</strong> → elle est l'<strong>oxydant</strong> (Ox₂). Elle est réduite.</p>
+    </div>
+    <div class="memo">
+      <div class="memo-title">🧠 Moyen mémo</div>
+      <p><strong>OILRIG</strong> : <em>Oxidation Is Loss, Reduction Is Gain</em> (d'électrons)</p>
+      <p>Ou en français : <strong>LEO le lion dit GER</strong> – <em>Lose Electrons Oxidation / Gain Electrons Reduction</em></p>
+    </div>
+  </div>
+
+  <div class="card highlight-purple">
+    <h2>🔗 Couples oxydant/réducteur</h2>
+    <p>Un couple redox s'écrit : <strong>Ox / Réd</strong></p>
+    <div class="formula">Ox  +  n e⁻  <span class="arrow">⇌</span>  Réd</div>
+    <p>Exemples de couples importants :</p>
+    <div class="formula"><span class="reduc">Cu²⁺ / Cu</span>   →   Cu²⁺ + 2e⁻ ⇌ Cu
+<span class="reduc">Fe³⁺ / Fe²⁺</span>  →   Fe³⁺ + e⁻  ⇌ Fe²⁺
+<span class="reduc">Zn²⁺ / Zn</span>   →   Zn²⁺ + 2e⁻ ⇌ Zn
+<span class="reduc">H⁺ / H₂</span>     →   2H⁺ + 2e⁻  ⇌ H₂
+<span class="reduc">MnO₄⁻/Mn²⁺</span> →  MnO₄⁻ + 8H⁺ + 5e⁻ ⇌ Mn²⁺ + 4H₂O</div>
+  </div>
+
+  <div class="card highlight-blue">
+    <h2>⚖️ Nombre d'oxydation (n.o.)</h2>
+    <div class="rule-box">
+      <div class="label">Règles de base</div>
+      <p>• Élément simple (Na, Fe, Cu…) : n.o. = <strong>0</strong></p>
+      <p>• Ion monoatomique (Fe²⁺) : n.o. = <strong>charge de l'ion</strong></p>
+      <p>• H dans molécule : n.o. = <strong>+I</strong> (sauf hydrures métalliques : −I)</p>
+      <p>• O dans molécule : n.o. = <strong>−II</strong> (sauf H₂O₂ : −I ; OF₂ : +II)</p>
+      <p>• Somme des n.o. = charge totale de l'espèce</p>
+    </div>
+    <h3>Exemple : n.o. du Mn dans MnO₄⁻</h3>
+    <div class="formula">n.o.(Mn) + 4×(−II) = −I
+n.o.(Mn) − 8 = −1
+<span class="coef">n.o.(Mn) = +VII</span></div>
+  </div>
+
+  <div class="card highlight-green">
+    <h2>🔄 Règle du gamma (γ)</h2>
+    <p>Pour combiner les deux demi-équations et que les électrons s'annulent :</p>
+    <div class="rule-box green">
+      <div class="label">Principe</div>
+      <p>Multiplier chaque demi-équation par un coefficient pour que <strong>le nombre d'électrons échangés soit identique</strong> dans les deux demi-réactions.</p>
+    </div>
+    <div class="formula">Ox₁ + n₁ e⁻ → Réd₁    (×n₂)
+Réd₂ → Ox₂ + n₂ e⁻    (×n₁)
+<span class="arrow">────────────────────────</span>
+Ox₁×n₂ + Réd₂×n₁ → Réd₁×n₂ + Ox₂×n₁</div>
+  </div>
+</section>
+
+<!-- ===================== DEMI-EQUATIONS ===================== -->
+<section id="demiequation">
+  <div class="page-header">
+    <div class="tag">Cours — Chimie STI2D</div>
+    <h1>Demi-équations électroniques</h1>
+    <p>Équilibrer les demi-réactions d'oxydation et de réduction</p>
+  </div>
+
+  <div class="card highlight-purple">
+    <h2>⚗️ Méthode d'équilibrage</h2>
+    <p>On suit <strong>5 étapes dans l'ordre</strong> :</p>
+    <div class="rule-box purple">
+      <div class="label">① Écrire les espèces Ox et Réd</div>
+      <p>Repérer l'élément qui change de nombre d'oxydation.</p>
+    </div>
+    <div class="rule-box purple">
+      <div class="label">② Équilibrer l'élément principal</div>
+      <p>Ajuster les coefficients pour équilibrer l'atome qui change de n.o.</p>
+    </div>
+    <div class="rule-box purple">
+      <div class="label">③ Équilibrer O avec H₂O</div>
+      <p>Ajouter des molécules H₂O du côté qui manque d'oxygène.</p>
+    </div>
+    <div class="rule-box purple">
+      <div class="label">④ Équilibrer H avec H⁺</div>
+      <p>Ajouter des ions H⁺ du côté qui manque d'hydrogène.</p>
+    </div>
+    <div class="rule-box purple">
+      <div class="label">⑤ Équilibrer les charges avec e⁻</div>
+      <p>Ajouter des électrons e⁻ pour équilibrer les charges totales. Les e⁻ sont à <strong>gauche</strong> si réduction, à <strong>droite</strong> si oxydation.</p>
+    </div>
+  </div>
+
+  <div class="card highlight-red">
+    <h2>✏️ Exemples détaillés</h2>
+
+    <h3>Exemple 1 : Couple Cu²⁺ / Cu (simple)</h3>
+    <div class="demi-eq">
+      <div class="side oxyd-side">Cu²⁺ + 2e⁻</div>
+      <div class="arr">→</div>
+      <div class="side">Cu</div>
+    </div>
+    <p style="font-size:.85rem;color:var(--muted)">Cu passe de n.o. +II à 0 → gain de 2e⁻ → <strong>réduction</strong></p>
+
+    <hr class="sep">
+
+    <h3>Exemple 2 : Couple MnO₄⁻ / Mn²⁺ (milieu acide)</h3>
+    <p style="font-size:.88rem;color:#c8cfe0;margin-bottom:10px">① MnO₄⁻ → Mn²⁺ &nbsp; ② Mn équilibré &nbsp; ③ ajouter 4 H₂O &nbsp; ④ ajouter 8 H⁺ &nbsp; ⑤ charges :</p>
+    <div class="formula">Charges à gauche : −1 + 8(+1) = +7
+Charges à droite : +2
+Différence : 7 − 2 = 5 e⁻ à gauche</div>
+    <div class="demi-eq">
+      <div class="side oxyd-side">MnO₄⁻ + 8H⁺ + 5e⁻</div>
+      <div class="arr">→</div>
+      <div class="side">Mn²⁺ + 4H₂O</div>
+    </div>
+
+    <hr class="sep">
+
+    <h3>Exemple 3 : Couple Cr₂O₇²⁻ / Cr³⁺ (milieu acide)</h3>
+    <div class="formula">① Cr₂O₇²⁻ → 2 Cr³⁺  (équilibrer Cr : ×2)
+③ 7 H₂O côté droit
+④ 14 H⁺ côté gauche
+⑤ Charges gauche : −2+14 = +12 / droite : 6
+   12 − 6 = 6e⁻ à gauche</div>
+    <div class="demi-eq">
+      <div class="side oxyd-side">Cr₂O₇²⁻ + 14H⁺ + 6e⁻</div>
+      <div class="arr">→</div>
+      <div class="side">2Cr³⁺ + 7H₂O</div>
+    </div>
+
+    <hr class="sep">
+
+    <h3>Exemple 4 : Oxydation du fer Fe²⁺ → Fe³⁺</h3>
+    <div class="demi-eq">
+      <div class="side">Fe²⁺</div>
+      <div class="arr">→</div>
+      <div class="side reduc-side">Fe³⁺ + e⁻</div>
+    </div>
+    <p style="font-size:.85rem;color:var(--muted)">Fe passe de +II à +III → perte de 1e⁻ → <strong>oxydation</strong></p>
+  </div>
+
+  <div class="card highlight-green">
+    <h2>🔗 Combiner les demi-équations</h2>
+    <p>Exemple : réaction entre MnO₄⁻ et Fe²⁺</p>
+    <div class="formula">Réduction : MnO₄⁻ + 8H⁺ + 5e⁻ → Mn²⁺ + 4H₂O  (×1)
+Oxydation : Fe²⁺ → Fe³⁺ + e⁻                    (×5)
+<span class="arrow">─────────────────────────────────────────────</span>
+MnO₄⁻ + 8H⁺ + 5Fe²⁺ → Mn²⁺ + 4H₂O + 5Fe³⁺</div>
+    <p style="font-size:.85rem;color:var(--muted)">Les 5e⁻ s'annulent → équation bilan correcte ✓</p>
+    <div class="rule-box green">
+      <div class="label">✅ Vérification obligatoire</div>
+      <p>Vérifier que chaque atome et chaque charge est équilibré des deux côtés !</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== EXERCICES ===================== -->
+<section id="exos">
+  <div class="page-header">
+    <div class="tag">Exercices — 1ère STI2D</div>
+    <h1>Exercices à faire sur cahier</h1>
+    <p>Combustion · Tableau d'avancement · Oxydoréduction · Demi-équations</p>
+  </div>
+
+  <!-- EXO 1 -->
+  <div class="card highlight-red">
+    <div class="exo-header">
+      <div class="exo-num red">1</div>
+      <div class="exo-title">Combustion de l'éthane <span class="badge facile">Facile</span></div>
+    </div>
+    <p>L'éthane a pour formule <strong>C₂H₆</strong>.</p>
+    <div class="question"><p><span class="q-num">Q1.</span> Écrire l'équation de combustion complète de l'éthane avec le dioxygène O₂.</p></div>
+    <div class="question"><p><span class="q-num">Q2.</span> Équilibrer cette équation en déterminant les coefficients stœchiométriques.</p></div>
+    <div class="question"><p><span class="q-num">Q3.</span> Vérifier que le nombre d'atomes de C, H et O est bien conservé.</p></div>
+    <div class="question"><p><span class="q-num">Q4.</span> Écrire l'équation de combustion incomplète (formation de CO).</p></div>
+    <button class="corr-btn" onclick="toggleCorr(this)">▶ Voir la correction</button>
+    <div class="correction">
+      <h4>✅ Correction</h4>
+      <p><strong>Q1 & Q2 :</strong> C₂H₆ + 7/2 O₂ → 2 CO₂ + 3 H₂O &nbsp; ou &nbsp; <strong>2 C₂H₆ + 7 O₂ → 4 CO₂ + 6 H₂O</strong></p>
+      <p><strong>Q3 :</strong> C : 2→2 ✓ &nbsp; H : 6→6 ✓ &nbsp; O : 7→7 ✓</p>
+      <p><strong>Q4 :</strong> 2 C₂H₆ + 5 O₂ → 4 CO + 6 H₂O (manque d'O₂)</p>
+    </div>
+  </div>
+
+  <!-- EXO 2 -->
+  <div class="card highlight-yellow">
+    <div class="exo-header">
+      <div class="exo-num yellow">2</div>
+      <div class="exo-title">Tableau d'avancement – réaction acido-basique <span class="badge facile">Facile</span></div>
+    </div>
+    <p>On fait réagir <strong>0,4 mol</strong> d'acide chlorhydrique HCl avec <strong>0,3 mol</strong> de soude NaOH.</p>
+    <p>L'équation est : <code>HCl + NaOH → NaCl + H₂O</code></p>
+    <div class="question"><p><span class="q-num">Q1.</span> Construire le tableau d'avancement avec les colonnes : État / x / n(HCl) / n(NaOH) / n(NaCl) / n(H₂O)</p></div>
+    <div class="question"><p><span class="q-num">Q2.</span> Déterminer le réactif limitant et calculer x<sub>max</sub>.</p></div>
+    <div class="question"><p><span class="q-num">Q3.</span> Calculer les quantités de matière de chaque espèce en fin de réaction.</p></div>
+    <button class="corr-btn" onclick="toggleCorr(this)">▶ Voir la correction</button>
+    <div class="correction">
+      <h4>✅ Correction</h4>
+      <p><strong>Q2 :</strong> HCl : 0,4/1 = 0,4 &nbsp;|&nbsp; NaOH : 0,3/1 = 0,3 → <strong>NaOH est le réactif limitant</strong> → x<sub>max</sub> = 0,3 mol</p>
+      <p><strong>Q3 :</strong> n(HCl) = 0,4 − 0,3 = <strong>0,1 mol</strong> &nbsp;|&nbsp; n(NaOH) = <strong>0 mol</strong> &nbsp;|&nbsp; n(NaCl) = <strong>0,3 mol</strong> &nbsp;|&nbsp; n(H₂O) = <strong>0,3 mol</strong></p>
+    </div>
+  </div>
+
+  <!-- EXO 3 -->
+  <div class="card highlight-blue">
+    <div class="exo-header">
+      <div class="exo-num">3</div>
+      <div class="exo-title">Combustion + tableau d'avancement <span class="badge moyen">Moyen</span></div>
+    </div>
+    <p>On brûle <strong>0,2 mol</strong> de propane C₃H₈ avec <strong>0,8 mol</strong> de O₂.</p>
+    <p>Rappel : C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O</p>
+    <div class="question"><p><span class="q-num">Q1.</span> Déterminer le réactif limitant.</p></div>
+    <div class="question"><p><span class="q-num">Q2.</span> Construire le tableau d'avancement complet.</p></div>
+    <div class="question"><p><span class="q-num">Q3.</span> Calculer les quantités de matière de CO₂ et H₂O formées.</p></div>
+    <div class="question"><p><span class="q-num">Q4.</span> La combustion est-elle complète ? Justifier.</p></div>
+    <button class="corr-btn" onclick="toggleCorr(this)">▶ Voir la correction</button>
+    <div class="correction">
+      <h4>✅ Correction</h4>
+      <p><strong>Q1 :</strong> C₃H₈ : 0,2/1 = 0,2 &nbsp;|&nbsp; O₂ : 0,8/5 = 0,16 → <strong>O₂ est le réactif limitant</strong> → x<sub>max</sub> = 0,16 mol</p>
+      <p><strong>Q3 :</strong> n(CO₂) = 3 × 0,16 = <strong>0,48 mol</strong> &nbsp;|&nbsp; n(H₂O) = 4 × 0,16 = <strong>0,64 mol</strong></p>
+      <p><strong>Q4 :</strong> Non, car du propane reste (0,2 − 0,16 = 0,04 mol) → combustion <strong>incomplète</strong> (manque d'O₂).</p>
+    </div>
+  </div>
+
+  <!-- EXO 4 -->
+  <div class="card highlight-green">
+    <div class="exo-header">
+      <div class="exo-num green">4</div>
+      <div class="exo-title">Nombre d'oxydation & identification redox <span class="badge moyen">Moyen</span></div>
+    </div>
+    <p>Pour chaque réaction, identifier l'oxydant, le réducteur, et dire si chaque espèce est oxydée ou réduite.</p>
+    <div class="question"><p><span class="q-num">Q1.</span> <code>Zn + 2 HCl → ZnCl₂ + H₂</code> &nbsp;—&nbsp; Calculer le n.o. de Zn avant et après, et de H avant et après.</p></div>
+    <div class="question"><p><span class="q-num">Q2.</span> <code>2 Fe³⁺ + Sn²⁺ → 2 Fe²⁺ + Sn⁴⁺</code> &nbsp;—&nbsp; Identifier oxydant et réducteur.</p></div>
+    <div class="question"><p><span class="q-num">Q3.</span> <code>Cu + 2 Ag⁺ → Cu²⁺ + 2 Ag</code> &nbsp;—&nbsp; Écrire les deux demi-équations électroniques.</p></div>
+    <button class="corr-btn" onclick="toggleCorr(this)">▶ Voir la correction</button>
+    <div class="correction">
+      <h4>✅ Correction</h4>
+      <p><strong>Q1 :</strong> Zn : 0 → +II (oxydation, Zn est le réducteur) &nbsp;|&nbsp; H : +I → 0 (réduction, H⁺ est l'oxydant)</p>
+      <p><strong>Q2 :</strong> Fe³⁺ est l'<strong>oxydant</strong> (Fe³⁺ → Fe²⁺, gain d'e⁻) &nbsp;|&nbsp; Sn²⁺ est le <strong>réducteur</strong> (Sn²⁺ → Sn⁴⁺, perte d'e⁻)</p>
+      <p><strong>Q3 :</strong> Réduction : Ag⁺ + e⁻ → Ag &nbsp;|&nbsp; Oxydation : Cu → Cu²⁺ + 2e⁻</p>
+    </div>
+  </div>
+
+  <!-- EXO 5 -->
+  <div class="card highlight-purple">
+    <div class="exo-header">
+      <div class="exo-num purple">5</div>
+      <div class="exo-title">Demi-équations et équation bilan <span class="badge moyen">Moyen</span></div>
+    </div>
+    <p>On étudie la réaction entre le permanganate de potassium KMnO₄ et le fer(II) FeSO₄ en milieu acide.</p>
+    <div class="question"><p><span class="q-num">Q1.</span> Écrire et équilibrer la demi-équation de réduction du couple MnO₄⁻ / Mn²⁺.</p></div>
+    <div class="question"><p><span class="q-num">Q2.</span> Écrire et équilibrer la demi-équation d'oxydation du couple Fe³⁺ / Fe²⁺.</p></div>
+    <div class="question"><p><span class="q-num">Q3.</span> En combinant les deux demi-équations, écrire l'équation bilan de la réaction.</p></div>
+    <div class="question"><p><span class="q-num">Q4.</span> Quelle est la couleur de MnO₄⁻ ? Et de Mn²⁺ ? Comment peut-on savoir que la réaction est terminée ?</p></div>
+    <button class="corr-btn" onclick="toggleCorr(this)">▶ Voir la correction</button>
+    <div class="correction">
+      <h4>✅ Correction</h4>
+      <p><strong>Q1 :</strong> MnO₄⁻ + 8H⁺ + 5e⁻ → Mn²⁺ + 4H₂O</p>
+      <p><strong>Q2 :</strong> Fe²⁺ → Fe³⁺ + e⁻</p>
+      <p><strong>Q3 :</strong> ×1 et ×5 → MnO₄⁻ + 8H⁺ + 5Fe²⁺ → Mn²⁺ + 4H₂O + 5Fe³⁺</p>
+      <p><strong>Q4 :</strong> MnO₄⁻ est <strong>violet</strong>, Mn²⁺ est <strong>quasi incolore</strong>. La réaction est terminée quand la solution reste colorée en violet (excès de MnO₄⁻).</p>
+    </div>
+  </div>
+
+  <!-- EXO 6 -->
+  <div class="card highlight-red">
+    <div class="exo-header">
+      <div class="exo-num red">6</div>
+      <div class="exo-title">Exercice de synthèse complet <span class="badge diff">Difficile</span></div>
+    </div>
+    <p>On fait réagir une solution contenant <strong>10 mmol de dichromate Cr₂O₇²⁻</strong> avec une solution de <strong>50 mmol de Fe²⁺</strong> en milieu acide.</p>
+    <p>Couples : <code>Cr₂O₇²⁻ / Cr³⁺</code> et <code>Fe³⁺ / Fe²⁺</code></p>
+    <div class="question"><p><span class="q-num">Q1.</span> Écrire et équilibrer la demi-équation de réduction de Cr₂O₇²⁻ en milieu acide.</p></div>
+    <div class="question"><p><span class="q-num">Q2.</span> Écrire la demi-équation d'oxydation de Fe²⁺.</p></div>
+    <div class="question"><p><span class="q-num">Q3.</span> Combiner les deux demi-équations pour obtenir l'équation bilan.</p></div>
+    <div class="question"><p><span class="q-num">Q4.</span> Construire le tableau d'avancement (les quantités sont en mmol).</p></div>
+    <div class="question"><p><span class="q-num">Q5.</span> Quel est le réactif limitant ? Calculer les quantités finales de Cr³⁺ et Fe³⁺.</p></div>
+    <button class="corr-btn" onclick="toggleCorr(this)">▶ Voir la correction</button>
+    <div class="correction">
+      <h4>✅ Correction</h4>
+      <p><strong>Q1 :</strong> Cr₂O₇²⁻ + 14H⁺ + 6e⁻ → 2Cr³⁺ + 7H₂O</p>
+      <p><strong>Q2 :</strong> Fe²⁺ → Fe³⁺ + e⁻</p>
+      <p><strong>Q3 :</strong> (×1) et (×6) → Cr₂O₇²⁻ + 14H⁺ + 6Fe²⁺ → 2Cr³⁺ + 7H₂O + 6Fe³⁺</p>
+      <p><strong>Q4 :</strong> Stœchio : 1 mol Cr₂O₇²⁻ pour 6 mol Fe²⁺</p>
+      <p>Cr₂O₇²⁻ : 10/1 = 10 &nbsp;|&nbsp; Fe²⁺ : 50/6 = 8,33 → <strong>Fe²⁺ est le réactif limitant</strong> → x<sub>max</sub> = 8,33 mmol</p>
+      <p><strong>Q5 :</strong> n(Cr³⁺) = 2 × 8,33 = <strong>16,67 mmol</strong> &nbsp;|&nbsp; n(Fe³⁺) = 6 × 8,33 = <strong>50 mmol</strong> (tout le Fe²⁺ transformé)</p>
+      <p>Reste n(Cr₂O₇²⁻) = 10 − 8,33 = 1,67 mmol</p>
+    </div>
+  </div>
+
+</section>
+
+<script>
+function show(id) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toggleCorr(btn) {
+  const corr = btn.nextElementSibling;
+  const open = corr.classList.toggle('show');
+  btn.textContent = open ? '▼ Masquer la correction' : '▶ Voir la correction';
+  btn.classList.toggle('open', open);
+}
+</script>
+</body>
+</html>

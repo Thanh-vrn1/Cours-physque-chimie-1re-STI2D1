@@ -289,6 +289,7 @@
   <button onclick="show('oxydoreduction')">⚡ Oxydoréduction</button>
   <button onclick="show('demiequation')">⚗️ Demi-équations</button>
   <button onclick="show('exos')">✏️ Exercices</button>
+  <button onclick="show('random')">🎲 Exos Aléatoires</button>
 </nav>
 
 <!-- ===================== COMBUSTION ===================== -->
@@ -794,6 +795,47 @@ MnO₄⁻ + 8H⁺ + 5Fe²⁺ → Mn²⁺ + 4H₂O + 5Fe³⁺</div>
 
 </section>
 
+<!-- ===================== EXOS ALÉATOIRES ===================== -->
+<section id="random">
+  <div class="page-header">
+    <div class="tag">Entraînement — 1ère STI2D</div>
+    <h1>Exercices Aléatoires</h1>
+    <p>Chaque clic génère un nouvel exercice différent !</p>
+  </div>
+
+  <div style="text-align:center;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
+    <button class="gen-btn" onclick="genRandom('combustion')" style="--c:var(--red)">🔥 Combustion</button>
+    <button class="gen-btn" onclick="genRandom('avancement')" style="--c:var(--yellow)">📊 Tableau d'avancement</button>
+    <button class="gen-btn" onclick="genRandom('redox')" style="--c:var(--green)">⚡ Oxydoréduction</button>
+    <button class="gen-btn" onclick="genRandom('demi')" style="--c:var(--purple)">⚗️ Demi-équations</button>
+    <button class="gen-btn" onclick="genRandom('mix')" style="--c:var(--accent1)">🎲 Surprise !</button>
+  </div>
+
+  <div id="random-output"></div>
+</section>
+
+<style>
+  .gen-btn {
+    background: none;
+    border: 2px solid var(--c);
+    color: var(--c);
+    font-family: 'Nunito', sans-serif;
+    font-size: .85rem;
+    font-weight: 800;
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all .25s;
+    letter-spacing: .03em;
+  }
+  .gen-btn:hover {
+    background: var(--c);
+    color: var(--bg);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--c) 40%, transparent);
+  }
+</style>
+
 <script>
 function show(id) {
   document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
@@ -808,6 +850,273 @@ function toggleCorr(btn) {
   const open = corr.classList.toggle('show');
   btn.textContent = open ? '▼ Masquer la correction' : '▶ Voir la correction';
   btn.classList.toggle('open', open);
+}
+
+/* =========== GÉNÉRATEUR D'EXERCICES ALÉATOIRES =========== */
+
+// --- DONNÉES ---
+const alcanes = [
+  { nom:'méthane',  f:'CH₄',     c:1, h:4 },
+  { nom:'éthane',   f:'C₂H₆',    c:2, h:6 },
+  { nom:'propane',  f:'C₃H₈',    c:3, h:8 },
+  { nom:'butane',   f:'C₄H₁₀',   c:4, h:10 },
+  { nom:'pentane',  f:'C₅H₁₂',   c:5, h:12 },
+  { nom:'hexane',   f:'C₆H₁₄',   c:6, h:14 },
+  { nom:'heptane',  f:'C₇H₁₆',   c:7, h:16 },
+  { nom:'octane',   f:'C₈H₁₈',   c:8, h:18 },
+];
+const alcools = [
+  { nom:'méthanol',  f:'CH₃OH',     c:1, h:4, o:1, fbrut:'CH₄O' },
+  { nom:'éthanol',   f:'C₂H₅OH',    c:2, h:6, o:1, fbrut:'C₂H₆O' },
+  { nom:'propan-1-ol', f:'C₃H₇OH', c:3, h:8, o:1, fbrut:'C₃H₈O' },
+];
+
+const couplesRedox = [
+  { ox:'Cu²⁺', red:'Cu',   e:2, demiRed:'Cu²⁺ + 2e⁻ → Cu',         demiOx:'Cu → Cu²⁺ + 2e⁻' },
+  { ox:'Zn²⁺', red:'Zn',   e:2, demiRed:'Zn²⁺ + 2e⁻ → Zn',         demiOx:'Zn → Zn²⁺ + 2e⁻' },
+  { ox:'Ag⁺',  red:'Ag',   e:1, demiRed:'Ag⁺ + e⁻ → Ag',            demiOx:'Ag → Ag⁺ + e⁻' },
+  { ox:'Fe²⁺', red:'Fe',   e:2, demiRed:'Fe²⁺ + 2e⁻ → Fe',          demiOx:'Fe → Fe²⁺ + 2e⁻' },
+  { ox:'Fe³⁺', red:'Fe²⁺', e:1, demiRed:'Fe³⁺ + e⁻ → Fe²⁺',         demiOx:'Fe²⁺ → Fe³⁺ + e⁻' },
+  { ox:'Pb²⁺', red:'Pb',   e:2, demiRed:'Pb²⁺ + 2e⁻ → Pb',          demiOx:'Pb → Pb²⁺ + 2e⁻' },
+  { ox:'Sn²⁺', red:'Sn',   e:2, demiRed:'Sn²⁺ + 2e⁻ → Sn',          demiOx:'Sn → Sn²⁺ + 2e⁻' },
+  { ox:'Ni²⁺', red:'Ni',   e:2, demiRed:'Ni²⁺ + 2e⁻ → Ni',          demiOx:'Ni → Ni²⁺ + 2e⁻' },
+];
+
+const couplesAvances = [
+  { ox:'MnO₄⁻', red:'Mn²⁺', e:5, demiRed:'MnO₄⁻ + 8H⁺ + 5e⁻ → Mn²⁺ + 4H₂O', demiOx:null, milieu:'acide' },
+  { ox:'Cr₂O₇²⁻', red:'Cr³⁺', e:6, demiRed:'Cr₂O₇²⁻ + 14H⁺ + 6e⁻ → 2Cr³⁺ + 7H₂O', demiOx:null, milieu:'acide', coefRed:2 },
+  { ox:'I₂', red:'I⁻', e:2, demiRed:'I₂ + 2e⁻ → 2I⁻', demiOx:'2I⁻ → I₂ + 2e⁻', coefRed:2 },
+];
+
+// --- UTILS ---
+function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+function randInt(min,max) { return Math.floor(Math.random()*(max-min+1))+min; }
+function frac(n) { return Number.isInteger(n) ? n : (n*10%1===0 ? n : n.toFixed(2)); }
+function pgcd(a,b){ a=Math.abs(a);b=Math.abs(b); while(b){[a,b]=[b,a%b];} return a; }
+function fracStr(num,den){ const g=pgcd(num,den); num/=g;den/=g; return den===1?''+num:num+'/'+den; }
+
+// Track used exercises to avoid repeats
+const usedExos = { combustion:[], avancement:[], redox:[], demi:[] };
+
+function pickUnique(arr, type) {
+  if(usedExos[type].length >= arr.length) usedExos[type] = [];
+  let item;
+  do { item = pick(arr); } while(usedExos[type].includes(item));
+  usedExos[type].push(item);
+  return item;
+}
+
+// --- GÉNÉRATEURS ---
+
+function genCombustion() {
+  const useAlcool = Math.random() < 0.3;
+  let mol, coefO2num, coefO2den, coefCO2, coefH2O, eq, eqEntiere;
+
+  if(useAlcool) {
+    mol = pickUnique(alcools, 'combustion');
+    // CnHmOp + (n + m/4 - p/2) O2 -> n CO2 + m/2 H2O
+    coefCO2 = mol.c;
+    coefH2O = mol.h / 2;
+    const o2 = mol.c + mol.h/4 - mol.o/2;
+    coefO2num = o2;
+    
+    if(Number.isInteger(o2)) {
+      eq = `${mol.f} + ${o2} O₂ → ${coefCO2} CO₂ + ${Math.round(coefH2O)} H₂O`;
+      eqEntiere = eq;
+    } else {
+      const num = mol.c*4 + mol.h - mol.o*2;
+      const den = 4;
+      const g = pgcd(num,den);
+      eq = `${mol.f} + ${fracStr(num,den)} O₂ → ${coefCO2} CO₂ + ${fracStr(mol.h,2)} H₂O`;
+      const mult = den/g;
+      eqEntiere = `${mult} ${mol.f} + ${num/g} O₂ → ${mult*coefCO2} CO₂ + ${mult*mol.h/2} H₂O`;
+    }
+  } else {
+    mol = pickUnique(alcanes, 'combustion');
+    coefCO2 = mol.c;
+    coefH2O = mol.h / 2;
+    const o2num = 2*mol.c + mol.h/2;
+    const o2den = 2;
+    
+    if(o2num % 2 === 0) {
+      const o2 = o2num/2;
+      eq = `${mol.f} + ${o2} O₂ → ${coefCO2} CO₂ + ${Math.round(coefH2O)} H₂O`;
+      eqEntiere = eq;
+    } else {
+      eq = `${mol.f} + ${fracStr(o2num,o2den)} O₂ → ${coefCO2} CO₂ + ${fracStr(mol.h,2)} H₂O`;
+      eqEntiere = `2 ${mol.f} + ${o2num} O₂ → ${2*coefCO2} CO₂ + ${mol.h} H₂O`;
+    }
+  }
+
+  const nMol = randInt(1,5) * 0.1;
+  const nO2 = +(nMol * (useAlcool ? (mol.c+mol.h/4-mol.o/2) : (mol.c+mol.h/4)) * (Math.random()>0.5?0.8:1.3)).toFixed(2);
+
+  const highlight = pick(['highlight-red','highlight-yellow','highlight-blue']);
+  const diff = pick(['Facile','Moyen']);
+
+  return `
+  <div class="card ${highlight}">
+    <div class="exo-header">
+      <div class="exo-num red">🔥</div>
+      <div class="exo-title">Combustion du ${mol.nom} <span class="badge ${diff==='Facile'?'facile':'moyen'}">${diff}</span></div>
+    </div>
+    <p>Le ${mol.nom} a pour formule <strong>${mol.f}</strong>.</p>
+    <div class="question"><p><span class="q-num">Q1.</span> Écrire l'équation de combustion complète du ${mol.nom} avec le dioxygène O₂.</p></div>
+    <div class="question"><p><span class="q-num">Q2.</span> Équilibrer cette équation en déterminant les coefficients stœchiométriques.</p></div>
+    <div class="question"><p><span class="q-num">Q3.</span> Vérifier l'équilibrage en comptant chaque type d'atome de chaque côté.</p></div>
+    ${diff==='Moyen'?`<div class="question"><p><span class="q-num">Q4.</span> On dispose de <strong>${nMol} mol</strong> de ${mol.nom} et <strong>${nO2} mol</strong> de O₂. Quel est le réactif limitant ?</p></div>`:''}
+    <button class="corr-btn" onclick="toggleCorr(this)">▶ Voir la correction</button>
+    <div class="correction">
+      <h4>✅ Correction</h4>
+      <p><strong>Q1 & Q2 :</strong></p>
+      <div class="formula">${eq}</div>
+      ${eq!==eqEntiere?`<p>Avec coefficients entiers :</p><div class="formula">${eqEntiere}</div>`:''}
+      <p><strong>Q3 :</strong> C : ${mol.c}→${mol.c} ✓ &nbsp; H : ${mol.h}→${mol.h} ✓ &nbsp; O : équilibré ✓</p>
+      ${diff==='Moyen'?`<p><strong>Q4 :</strong> ${mol.nom} : ${nMol}/1 = ${nMol} &nbsp;|&nbsp; O₂ : ${nO2}/${frac(mol.c+mol.h/4-(useAlcool?mol.o/2:0))} = ${(nO2/(mol.c+mol.h/4-(useAlcool?mol.o/2:0))).toFixed(3)}<br>→ Le réactif limitant est <strong>${(nMol < nO2/(mol.c+mol.h/4-(useAlcool?mol.o/2:0))) ? mol.nom : 'O₂'}</strong></p>`:''}
+    </div>
+  </div>`;
+}
+
+function genAvancement() {
+  const reactions = [
+    { eq:'HCl + NaOH → NaCl + H₂O', reactifs:['HCl','NaOH'], produits:['NaCl','H₂O'], coefR:[1,1], coefP:[1,1] },
+    { eq:'2 HCl + Ca(OH)₂ → CaCl₂ + 2 H₂O', reactifs:['HCl','Ca(OH)₂'], produits:['CaCl₂','H₂O'], coefR:[2,1], coefP:[1,2] },
+    { eq:'CH₄ + 2 O₂ → CO₂ + 2 H₂O', reactifs:['CH₄','O₂'], produits:['CO₂','H₂O'], coefR:[1,2], coefP:[1,2] },
+    { eq:'C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O', reactifs:['C₃H₈','O₂'], produits:['CO₂','H₂O'], coefR:[1,5], coefP:[3,4] },
+    { eq:'2 C₂H₆ + 7 O₂ → 4 CO₂ + 6 H₂O', reactifs:['C₂H₆','O₂'], produits:['CO₂','H₂O'], coefR:[2,7], coefP:[4,6] },
+    { eq:'N₂ + 3 H₂ → 2 NH₃', reactifs:['N₂','H₂'], produits:['NH₃'], coefR:[1,3], coefP:[2] },
+    { eq:'2 Al + 3 Cl₂ → 2 AlCl₃', reactifs:['Al','Cl₂'], produits:['AlCl₃'], coefR:[2,3], coefP:[2] },
+    { eq:'Fe₂O₃ + 3 CO → 2 Fe + 3 CO₂', reactifs:['Fe₂O₃','CO'], produits:['Fe','CO₂'], coefR:[1,3], coefP:[2,3] },
+  ];
+
+  const r = pickUnique(reactions, 'avancement');
+  const n1 = +(randInt(1,8) * 0.1).toFixed(1);
+  const n2 = +(randInt(1,8) * 0.1).toFixed(1);
+  
+  const test1 = n1 / r.coefR[0];
+  const test2 = n2 / r.coefR[1];
+  const limitIdx = test1 <= test2 ? 0 : 1;
+  const xmax = +(Math.min(test1, test2)).toFixed(4);
+  
+  const finR1 = +(n1 - r.coefR[0]*xmax).toFixed(4);
+  const finR2 = +(n2 - r.coefR[1]*xmax).toFixed(4);
+  const finP = r.coefP.map(c => +(c*xmax).toFixed(4));
+
+  return `
+  <div class="card highlight-yellow">
+    <div class="exo-header">
+      <div class="exo-num yellow">📊</div>
+      <div class="exo-title">Tableau d'avancement <span class="badge moyen">Moyen</span></div>
+    </div>
+    <p>On fait réagir <strong>${n1} mol</strong> de ${r.reactifs[0]} avec <strong>${n2} mol</strong> de ${r.reactifs[1]}.</p>
+    <p>L'équation est : <code>${r.eq}</code></p>
+    <div class="question"><p><span class="q-num">Q1.</span> Construire le tableau d'avancement.</p></div>
+    <div class="question"><p><span class="q-num">Q2.</span> Déterminer le réactif limitant et calculer x<sub>max</sub>.</p></div>
+    <div class="question"><p><span class="q-num">Q3.</span> Calculer les quantités de matière de chaque espèce en fin de réaction.</p></div>
+    <button class="corr-btn" onclick="toggleCorr(this)">▶ Voir la correction</button>
+    <div class="correction">
+      <h4>✅ Correction</h4>
+      <p><strong>Q2 :</strong> ${r.reactifs[0]} : ${n1}/${r.coefR[0]} = ${(n1/r.coefR[0]).toFixed(3)} &nbsp;|&nbsp; ${r.reactifs[1]} : ${n2}/${r.coefR[1]} = ${(n2/r.coefR[1]).toFixed(3)}</p>
+      <p>→ <strong>${r.reactifs[limitIdx]} est le réactif limitant</strong> → x<sub>max</sub> = ${+xmax.toFixed(3)} mol</p>
+      <p><strong>Q3 :</strong></p>
+      <p>n(${r.reactifs[0]}) = ${n1} − ${r.coefR[0]}×${+xmax.toFixed(3)} = <strong>${+finR1.toFixed(3)} mol</strong></p>
+      <p>n(${r.reactifs[1]}) = ${n2} − ${r.coefR[1]}×${+xmax.toFixed(3)} = <strong>${+finR2.toFixed(3)} mol</strong></p>
+      ${r.produits.map((p,i) => `<p>n(${p}) = ${r.coefP[i]}×${+xmax.toFixed(3)} = <strong>${+finP[i].toFixed(3)} mol</strong></p>`).join('')}
+    </div>
+  </div>`;
+}
+
+function genRedox() {
+  // Pick two different couples where one can reduce the other
+  let c1, c2;
+  do {
+    c1 = pickUnique(couplesRedox, 'redox');
+    c2 = pick(couplesRedox);
+  } while(c1 === c2);
+  
+  // c1.ox + c2.red -> c1.red + c2.ox (c1 is reduced, c2 is oxidized)
+  const lcm = (c1.e * c2.e) / pgcd(c1.e, c2.e);
+  const coef1 = lcm / c1.e;
+  const coef2 = lcm / c2.e;
+  
+  const eqParts = [];
+  eqParts.push(coef1 > 1 ? `${coef1} ${c1.ox}` : c1.ox);
+  eqParts.push(coef2 > 1 ? `${coef2} ${c2.red}` : c2.red);
+  const prodParts = [];
+  prodParts.push(coef1 > 1 ? `${coef1} ${c1.red}` : c1.red);
+  prodParts.push(coef2 > 1 ? `${coef2} ${c2.ox}` : c2.ox);
+  
+  const bilan = eqParts.join(' + ') + ' → ' + prodParts.join(' + ');
+
+  return `
+  <div class="card highlight-green">
+    <div class="exo-header">
+      <div class="exo-num green">⚡</div>
+      <div class="exo-title">Oxydoréduction : ${c1.ox}/${c1.red} et ${c2.ox}/${c2.red} <span class="badge moyen">Moyen</span></div>
+    </div>
+    <p>On étudie la réaction entre <strong>${c1.ox}</strong> (couple ${c1.ox}/${c1.red}) et <strong>${c2.red}</strong> (couple ${c2.ox}/${c2.red}).</p>
+    <div class="question"><p><span class="q-num">Q1.</span> Identifier l'oxydant et le réducteur.</p></div>
+    <div class="question"><p><span class="q-num">Q2.</span> Écrire la demi-équation de réduction.</p></div>
+    <div class="question"><p><span class="q-num">Q3.</span> Écrire la demi-équation d'oxydation.</p></div>
+    <div class="question"><p><span class="q-num">Q4.</span> En déduire l'équation bilan en équilibrant les électrons.</p></div>
+    <button class="corr-btn" onclick="toggleCorr(this)">▶ Voir la correction</button>
+    <div class="correction">
+      <h4>✅ Correction</h4>
+      <p><strong>Q1 :</strong> L'oxydant est <strong>${c1.ox}</strong> (il gagne des e⁻) — Le réducteur est <strong>${c2.red}</strong> (il perd des e⁻)</p>
+      <p><strong>Q2 (réduction) :</strong></p>
+      <div class="formula">${c1.demiRed} &nbsp; (×${coef1})</div>
+      <p><strong>Q3 (oxydation) :</strong></p>
+      <div class="formula">${c2.demiOx} &nbsp; (×${coef2})</div>
+      <p><strong>Q4 (bilan) :</strong> On multiplie pour annuler les ${lcm} e⁻ :</p>
+      <div class="formula">${bilan}</div>
+    </div>
+  </div>`;
+}
+
+function genDemi() {
+  const allCouples = [...couplesRedox, ...couplesAvances.filter(c=>c.demiOx||c.demiRed)];
+  const c = pickUnique(allCouples, 'demi');
+  const isReduction = Math.random() > 0.4;
+  
+  return `
+  <div class="card highlight-purple">
+    <div class="exo-header">
+      <div class="exo-num purple">⚗️</div>
+      <div class="exo-title">Demi-équation : ${c.ox} / ${c.red} <span class="badge ${c.milieu?'diff':'facile'}">${c.milieu?'Difficile':'Facile'}</span></div>
+    </div>
+    <p>On considère le couple <strong>${c.ox} / ${c.red}</strong>${c.milieu?' en milieu <strong>'+c.milieu+'</strong>':''}.</p>
+    <div class="question"><p><span class="q-num">Q1.</span> Écrire et équilibrer la demi-équation de <strong>${isReduction?'réduction':'oxydation'}</strong> de ce couple.</p></div>
+    <div class="question"><p><span class="q-num">Q2.</span> Combien d'électrons sont échangés ?</p></div>
+    <div class="question"><p><span class="q-num">Q3.</span> L'espèce ${isReduction?c.ox:c.red} est-elle un oxydant ou un réducteur ? Justifier.</p></div>
+    <button class="corr-btn" onclick="toggleCorr(this)">▶ Voir la correction</button>
+    <div class="correction">
+      <h4>✅ Correction</h4>
+      <p><strong>Q1 :</strong></p>
+      <div class="formula">${isReduction ? c.demiRed : (c.demiOx||'(inverser la demi-équation de réduction)')}</div>
+      <p><strong>Q2 :</strong> <strong>${c.e} électron${c.e>1?'s':''}</strong> ${isReduction?'gagné':'perdu'}${c.e>1?'s':''}</p>
+      <p><strong>Q3 :</strong> ${isReduction?c.ox+' est l\'<strong>oxydant</strong> (il gagne des e⁻ = il est réduit)':c.red+' est le <strong>réducteur</strong> (il perd des e⁻ = il est oxydé)'}</p>
+    </div>
+  </div>`;
+}
+
+function genRandom(type) {
+  const output = document.getElementById('random-output');
+  let html = '';
+  
+  if(type === 'mix') {
+    const types = ['combustion','avancement','redox','demi'];
+    type = types[Math.floor(Math.random()*types.length)];
+  }
+  
+  switch(type) {
+    case 'combustion': html = genCombustion(); break;
+    case 'avancement': html = genAvancement(); break;
+    case 'redox':      html = genRedox(); break;
+    case 'demi':       html = genDemi(); break;
+  }
+  
+  output.innerHTML = html;
+  output.firstElementChild.style.animation = 'fadeUp .4s ease both';
 }
 </script>
 </body>
